@@ -1,4 +1,3 @@
-import torch
 from torch import Tensor
 import torch.nn.functional as F
 from transformers import AutoTokenizer, AutoModel

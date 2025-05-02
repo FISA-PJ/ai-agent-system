@@ -11,7 +11,7 @@ es =  Elasticsearch('http://localhost:9200')
 api_key = os.getenv("OPENAI_API_KEY")
 openai = OpenAI(api_key=api_key)
 model_name = 'intfloat/multilingual-e5-small'
-index_name = 'rag-test2'
+index_name = 'rag-test3'
 
 
 def answer_question(query) :
