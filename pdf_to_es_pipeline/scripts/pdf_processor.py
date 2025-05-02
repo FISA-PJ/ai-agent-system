@@ -1,4 +1,5 @@
 import os
+from io import BytesIO
 import openparse
 
 import torch
@@ -30,6 +31,7 @@ class pdfProcessor() :
         text = '\n'.join(text_list)
         
         return text
+    
     
     # ------ Chunking ------
     def text_chunking(self, text, chunk_size=2000, chunk_overlap = 200) :
