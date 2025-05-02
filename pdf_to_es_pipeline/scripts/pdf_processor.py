@@ -13,9 +13,10 @@ from elasticsearch import helpers
 
 
 class pdfProcessor() :
-    def __init__ (self, es, index_name, model_name='intfloat/multilingual-e5-small') :
+    def __init__ (self, es, batch_size, index_name, model_name='intfloat/multilingual-e5-small') :
         self.es = es
         self.index_name = index_name
+        self.batch_size = batch_size
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.model = AutoModel.from_pretrained(model_name)
     
@@ -51,10 +52,10 @@ class pdfProcessor() :
         return last_hidden.sum(dim=1) / attention_mask.sum(dim=1)[..., None]
 
 
-    def text_embedding(self, chunks, batch_size = 16) : 
+    def text_embedding(self, chunks) : 
         all_embeddings = []
-        for i in range(0, len(chunks), batch_size) : 
-            batch = chunks[i:i+batch_size]
+        for i in range(0, len(chunks), self.batch_size) : 
+            batch = chunks[i:i+self.batch_size]
             batch_dict = self.tokenizer(
                 batch, 
                 max_length=512, 
@@ -73,43 +74,44 @@ class pdfProcessor() :
     
     
     #------ Elasticsearch ------
-    def upload_embeddings_to_es(self, chunks, embeddings, filename, batch_size=16) :
-        title = ' '.join(filename.split(' ')[1:-1])
+    # 입력 값 수정 
+    def upload_embeddings_to_es(self, chunks, embeddings, safe_filename, pdf_name) :
         
-        for i in range(0, len(chunks), batch_size):
+        for i in range(0, len(chunks), self.batch_size):
             actions = []
-            chunk_batch = chunks[i:i+batch_size]
-            embedding_batch = embeddings[i:i+batch_size]
+            chunk_batch = chunks[i:i+self.batch_size]
+            embedding_batch = embeddings[i:i+self.batch_size]
             
             for idx, (chunk, embedding) in enumerate(zip(chunk_batch, embedding_batch)) :
                 action = {
                     '_index' : self.index_name,
-                    '_id' : f"{title}_{i+idx}",
+                    '_id' : f"{pdf_name}_{i+idx}",
                     '_source' : {
                         'content' : chunk,
                         'embedding' : embedding,
-                        'source_pdf' : filename,
+                        'source_pdf' : safe_filename,
                         'chunk_id' : i+idx
                     }
                 }
+                print(f"{pdf_name}_{i+idx}")
                 actions.append(action)
             helpers.bulk(self.es, actions, raise_on_error = True)
-        print(f"☺️ {filename}의 {len(chunks)}개 청크를 ES에 성공적으로 저장했습니다")
+        print(f"☺️ {pdf_name}의 {len(chunks)}개 청크를 ES에 성공적으로 저장했습니다")
 
 
 
-if __name__ == "__main__" :
-    os.chdir('./data')
+# if __name__ == "__main__" :
+#     os.chdir('./data')
     
-    batch_size = 32
-    index_name = 'rag-test2'
-    es =  Elasticsearch('http://localhost:9200')
+#     batch_size = 32
+#     index_name = 'rag-test2'
+#     es =  Elasticsearch('http://localhost:9200')
     
-    processor = pdfProcessor(es, index_name)
+#     processor = pdfProcessor(es, index_name)
 
-    for filename in os.listdir('.'):
-        file_path = filename
-        text = processor.pdf_parser(file_path)
-        chunks = processor.text_chunking(text)
-        embeddings = processor.text_embedding(chunks, batch_size)
-        processor.upload_embeddings_to_es(chunks, embeddings, filename, batch_size=16)
+#     for filename in os.listdir('.'):
+#         file_path = filename
+#         text = processor.pdf_parser(file_path)
+#         chunks = processor.text_chunking(text)
+#         embeddings = processor.text_embedding(chunks, batch_size)
+#         processor.upload_embeddings_to_es(chunks, embeddings, filename, batch_size=16)
