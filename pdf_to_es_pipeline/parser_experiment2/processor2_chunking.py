@@ -190,7 +190,7 @@ class SemanticSplitter(TextSplitter) :
         print(f"INFO: {len(output)} 개의 Child Chunk가 생성되었습니다.")
         return output
 
-class GeminiSplitter(TextSplitter) :
+class LLMSplitter(TextSplitter) :
     def __init__(self, gemini_api_key : str, prompt : str, model_name : str= "Gemini-1.5-Pro", min_child_length : int = 1000) :
         super().__init__
         self.gemini_api_key = gemini_api_key
