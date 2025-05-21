@@ -81,7 +81,6 @@ class ElasticsearchDocstore(BaseStore):
 
 class CustomElasticsearchStore(ElasticsearchStore):
     def add_texts(self, texts, metadatas=None, ids=None, **kwargs):
-        print(metadatas)
         # ID를 명시하지 않았을 경우 자동 생성
         if ids is None:
             ids = []
