@@ -1,5 +1,7 @@
 **/data/
-**/downloads/
+
 **/__pycache__/
 pdf_to_es_pipeline/chromedriver.exe
+pdf_to_es_pipeline/experiment_results_upstage
+
 .env
