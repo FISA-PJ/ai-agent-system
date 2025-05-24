@@ -1,11 +1,7 @@
-import os
 import re
-import json
 import pandas as pd
 from io import StringIO
-from dotenv import load_dotenv
 from bs4 import BeautifulSoup
-
 import html2text
 import openparse
 from langchain_upstage import UpstageDocumentParseLoader
@@ -27,7 +23,7 @@ class Parser2Markdown:
         Returns:
             str: HTML 태그가 포함된 문서 내용 문자열
         """
-        print("======== ⏳ PDF 공고문을 UpstageDocumentParseLoader로 파싱 진행 중입니다. ========")
+        print("======== ⏳ 1. PDF 공고문을 UpstageDocumentParseLoader로 파싱 진행 중입니다. ========")
 
         loader = UpstageDocumentParseLoader(
             file_path=file_path,
@@ -38,11 +34,10 @@ class Parser2Markdown:
             ocr="force",            # Literal['auto', 'force'] = 'auto'
         )
 
-
         html_contents = loader.load()
         html_content = html_contents[0].page_content
 
-        print("======== ☺️ 공고문 파싱이 완료되었습니다. ========")
+        print("======== INFO: [완료] PDF 공고문 파싱이 완료되었습니다. ========")
         return html_content 
     
 
@@ -56,7 +51,7 @@ class Parser2Markdown:
         Returns:
             str: 추출한 텍스트 문자열
         """
-        print("======== ⏳ PDF 공고문을 Openpare로 파싱 진행 중입니다. ========")
+        print("======== ⏳ 1. PDF 공고문을 Openparse로 파싱 진행 중입니다. ========")
         
         parser = openparse.DocumentParser()
         parsed_docs = parser.parse(file_path)
@@ -65,7 +60,7 @@ class Parser2Markdown:
         texts = [node.text for node in parsed_docs.nodes if hasattr(node, 'text')]
         text = '\n'.join(texts)
         
-        print("======== ☺️ 공고문 파싱이 완료되었습니다. ========")
+        print("======== INFO: [완료] PDF 공고문 파싱이 완료되었습니다. ========")
         return text
     
     
@@ -105,51 +100,47 @@ class Parser2Markdown:
         if isinstance(df.columns, pd.MultiIndex):
             df.columns = self.flatten_multiindex_columns(df.columns)
 
-        return df.to_markdown(index=False), df.to_dict(orient='records')
+        #return df.to_markdown(index=False), df.to_dict(orient='records')
+        return df.to_dict(orient='records')
 
 
     def html2md_with_spans(self, html_content: str) -> tuple[str, list]:
         """
-        HTML 문서 내 모든 <table> 태그를 Markdown과 JSON으로 변환 후,
-        placeholder로 대체 → Markdown 변환 → placeholder 복원 과정을 수행합니다.
+        HTML 문서 내 모든 <table> 태그를 JSON으로 변환 후,
+        placeholder로 대체 → JSON 변환을 수행합니다.
 
         Args:
             html_content (str): HTML 문서 전체 문자열
 
         Returns:
-            tuple: (최종 Markdown 문자열, 각 테이블 JSON 및 사용여부 리스트)
+            최종 Markdown 문자열
         """
         
-        print("======== ⏳ HTML 문서를 마크다운 형식으로 변환 중입니다. ========")
+        print("======== ⏳ 2. HTML 문서를 마크다운 형식으로 변환 중입니다. ========")
         soup = BeautifulSoup(html_content, "html.parser")
 
         REMOVE_TAGS = ["header", "footer"]
-        for tag in soup.find_all(REMOVE_TAGS):
+        for tag in soup.find_all(REMOVE_TAGS):  # 태그 제거
             tag.decompose()
         for br in soup.find_all("br"):
             br.replace_with(" ")
 
         table_placeholders = []
-
         for idx, table in enumerate(soup.find_all("table")):
-            md_table, json_table = self.convert_table_to_markdown(str(table))
+            json_table = self.convert_table_to_markdown(str(table))
             table_placeholder = f"__TABLE_PLACEHOLDER_{idx}__"
-            table_placeholders.append((table_placeholder, md_table, json_table))
+            table_placeholders.append((table_placeholder, json_table))
             table.replace_with(table_placeholder)
 
+
         h = html2text.HTML2Text()
-        h.body_width = 0
+        h.body_width = 0    # 자동 줄바꿈 False 
         markdown_text = h.handle(str(soup))
         markdown_text = re.sub(r'\n+', '\n', markdown_text).strip()
 
-        table_spans = []
-        for table_placeholder, md_table, json_table in table_placeholders:
-            markdown_text = markdown_text.replace(table_placeholder, f"<table>{md_table}</table>")
-            table_spans.append({
-                'used': 0,                  # 사용 여부 (기본값 0)
-                'json_table': json_table
-            })
+        # JSON 형태로 변환
+        for table_placeholder, json_table in table_placeholders:
+            markdown_text = markdown_text.replace(table_placeholder, f"{json_table}")
 
-
-        print("======== ☺️ 마크다운 형식으로 변환되었습니다. ========")
-        return markdown_text, table_spans
+        print("======== INFO: [완료] 마크다운 형식으로 변환되었습니다. ========\n")
+        return markdown_text
