@@ -29,9 +29,9 @@ services:
         hard: -1
     ports:
       - 9200:9200
-    # volumes:
-    #  - ./es/es1/data:/usr/share/elasticsearch/data
-    #  - ./es/es1/log:/usr/share/elasticsearch/log
+    volumes:
+     - ./es/es1/data:/usr/share/elasticsearch/data
+     - ./es/es1/log:/usr/share/elasticsearch/log
   # es2:
   #   image: elasticsearch:${STACK_VERSION}
   #   container_name: es2

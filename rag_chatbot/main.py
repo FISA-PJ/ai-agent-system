@@ -1,23 +1,33 @@
 import os
 from dotenv import load_dotenv
-from openai import OpenAI
 import certifi
-from scripts.search_documents import search_documents
+from openai import OpenAI
 from elasticsearch import Elasticsearch
+from langchain_elasticsearch import ElasticsearchStore
+
+from scripts.search_documents import search_documents
+from scripts.processor3_embedding import BgeM3Embedding
 
 load_dotenv()
 
 es =  Elasticsearch('http://localhost:9200')
 api_key = os.getenv("OPENAI_API_KEY")
-os.environ["SSL_CERT_FILE"] = certifi.where()
 openai = OpenAI(api_key=api_key)
-model_name = 'intfloat/multilingual-e5-large'
-index_name = 'child-chunks-00'
-#apt_code = '0000060867'
+os.environ["SSL_CERT_FILE"] = certifi.where()
+embeddings = BgeM3Embedding()
+
+index_name = 'test-0524'
+apt_code = '0000060867'
+
+vectorstore = ElasticsearchStore(
+    index_name=index_name,
+    embedding=embeddings,
+    es_connection=es,
+)
 
 def answer_question(query) :
     global relevant_docs
-    relevant_docs = search_documents(query, es, index_name, model_name)
+    relevant_docs = search_documents(query, vectorstore, apt_code)
     
     prompt = f"""
         [문서 내용]

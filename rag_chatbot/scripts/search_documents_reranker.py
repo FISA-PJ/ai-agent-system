@@ -7,17 +7,17 @@ from reranker import KoReranker
 from langchain.schema import Document
 from processor3_embedding import BgeM3Embedding
 def search_documents(query, es, apt_code) :
-    # retriever = vectorstore.as_retriever(
-    #     search_type="similarity",
-    #     search_kwargs={
-    #         "k": 10,
-    #         "filter": {
-    #             "term": {
-    #                 "metadata.apt_code": f"upstage-{apt_code}"
-    #             }
-    #         }
-    #     }
-    # )
+    retriever = vectorstore.as_retriever(
+        search_type="similarity",
+        search_kwargs={
+            "k": 10,
+            "filter": {
+                "term": {
+                    "metadata.apt_code": f"upstage-{apt_code}"
+                }
+            }
+        }
+    )
 
     embeddings = BgeM3Embedding()
     query_embedding = embeddings.embed_query(query)
@@ -35,9 +35,28 @@ def search_documents(query, es, apt_code) :
         }
     })["hits"]["hits"]
     
-    # 🔽 유사도 점수(score) 기준으로 내림차순 정렬 후 상위 3개
-    top3_docs = sorted(docs, key=lambda d: d["_score"], reverse=True)[:3]
-    return top3_docs
+    candidate_docs = [
+        Document(
+            page_content=hit["_source"]["text"],  # 또는 "content", 필드 이름에 따라 수정
+            metadata=hit["_source"].get("metadata", {})
+        )
+        for hit in docs
+    ]
+    #candidate_docs = retriever .get_relevant_documents(query)
+    print(f'candidate_docs : {len(candidate_docs)}')
+    reranker = KoReranker(model_name="Dongjin-kr/ko-reranker", device="cuda" if torch.cuda.is_available() else "cpu")
+    reranked_docs = reranker.rerank(query, candidate_docs, top_k=3, return_scores=True)
+
+    print(f'reranked_docs : {len(reranked_docs)}')
+    #Step 3: 결과 반환
+    return [
+        # {
+        #     "content": doc.page_content[:100],  # 앞 100자만
+        #     "metadata": doc.metadata,
+        # }
+        doc
+        for doc in reranked_docs
+    ]
 
 
 if __name__ == '__main__' :

@@ -1,7 +1,8 @@
 **/data/
-
 **/__pycache__/
-pdf_to_es_pipeline/chromedriver.exe
-pdf_to_es_pipeline/experiment_results_upstage
 
+DocStreamProcessor/chromedriver.exe
+DocStreamProcessor/experiment_results_upstage
+
+rag_chatbot/chatbot_api.py
 .env
