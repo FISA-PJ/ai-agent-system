@@ -141,19 +141,15 @@ class SemanticSplitter():
         print("======== ⏳ 4. Semantic Chunking 전체 문서 처리 중입니다. ========")
         output: List[Document] = []
 
-        for doc in docs:
-            apt_code = doc.metadata.get("apt_code", "unknown")
+        for i, doc in enumerate(docs):
             text_blocks = (
                 [doc.page_content] if len(doc.page_content) < self.min_child_length
                 else self.split_by_semantic(doc.page_content)
             )
 
-            for block in text_blocks:
-                base = f"{apt_code}:{block}"
-                child_id = hashlib.sha256(base.encode("utf-8")).hexdigest()
-
+            for j ,block in enumerate(text_blocks):
                 metadata = dict(doc.metadata)
-                metadata["child_id"] = child_id
+                metadata["chunk_id"] = f"{i}-{j}"
 
                 output.append(Document(page_content=block, metadata=metadata))
 
