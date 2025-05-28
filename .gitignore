@@ -4,5 +4,4 @@
 DocStreamProcessor/chromedriver.exe
 DocStreamProcessor/experiment_results_upstage
 
-rag_chatbot/chatbot_api.py
 .env
