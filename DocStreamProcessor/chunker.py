@@ -1,8 +1,6 @@
 import re
-import hashlib
 from typing import List, Any
 from langchain.schema import Document
-from langchain.text_splitter import TextSplitter
 from langchain_experimental.text_splitter import SemanticChunker
 
 
