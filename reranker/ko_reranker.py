@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 from typing import List, Union, Tuple
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
