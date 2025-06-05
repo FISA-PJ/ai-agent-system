@@ -1,21 +1,36 @@
 """
 대출 필터링 및 계산 함수 (LTV, 월 예상 상환액 등)
 """
+import os
 import pandas as pd
+from tools import get_db_connection
+
 
 # 대출 상품 불러오는 함수 (DB 대체)
 def load_loan_products() -> pd.DataFrame:
-    df = pd.read_csv("./data/loanlist_data.csv", encoding="utf-8")
-    return df
+    """
+    housing_loan_products 테이블에서 대출 상품 데이터를 불러옵니다.
+    """
+    # DB 연결 설정
+    conn = get_db_connection(os.getenv("LOAN_DB"))
 
+    try:
+        with conn.cursor() as cursor:
+            # 쿼리 실행
+            cursor.execute("SELECT * FROM housing_loan_products")
+            rows = cursor.fetchall()
+            df = pd.DataFrame(rows)
+            return df
+    finally:
+        conn.close()
 
 # 사용자 조건에 맞는 대출 상품 필터링하는 함수
-def filter_loan_products(user_info: dict, df: pd.DataFrame) -> pd.DataFrame:
-    age = user_info["age"]
-    income = user_info["annual_income"] // 10000  # 만원 단위로 변환
-    is_homeless = user_info["is_homeless"]
-    is_first_time = user_info["is_first_time"]
-    group_type = user_info["group_type"]
+def filter_loan_products(user_db_info: dict, df: pd.DataFrame) -> pd.DataFrame:
+    age = user_db_info["age"]
+    income = user_db_info["annual_income"] // 10000  # 만원 단위로 변환
+    is_homeless = user_db_info["is_homeless"]
+    is_first_time = user_db_info["is_first_time"]
+    group_type = user_db_info["group_type"]
 
     # 조건별 필터링
     filtered_df = df[
@@ -28,7 +43,9 @@ def filter_loan_products(user_info: dict, df: pd.DataFrame) -> pd.DataFrame:
         ((df["first_home_only"] == False) | is_first_time)
     ]
 
-    return filtered_df.reset_index(drop=True).to_dict(orient="records")
+    loan_filter = filtered_df.sort_values("rate_max").reset_index(drop=True)
+
+    return loan_filter.to_dict(orient="records")
 
 
 # LTV 계산 함수
@@ -66,7 +83,7 @@ def calculate_max_loan_amount(sale_price: int, ltv_ratio: float) -> int:
     주택 분양가(sale_price)와 LTV 비율(ltv_ratio)을 이용하여
     최대 대출 가능 금액(원 단위)을 계산합니다.
     """
-    return int(sale_price * ltv_ratio)
+    return int(float(sale_price) * ltv_ratio)
 
 
 # 월 예상 상환액 계산
@@ -113,9 +130,9 @@ def calculate_monthly_payment(loan_amount: int, rate_min: float, rate_max: float
 
 
 # 사용자 정보로 필터링 된 대출 상품들에 월 예상 상환액 계산 후 정렬
-def rank_loan_products(user_info: dict, filtered_df: pd.DataFrame, max_loan_amount: int) -> pd.DataFrame:
+def rank_loan_products(user_db_info: dict, filtered_df: pd.DataFrame, max_loan_amount: int) -> pd.DataFrame:
     """
-    user_info는 현재 로직에서는 사용되지 않지만,
+    user_db_info는 현재 로직에서는 사용되지 않지만,
     향후 사용자 특성 기반 정렬 확장을 위해 파라미터로 유지함
     """
     filtered_df = filtered_df.copy()
@@ -127,8 +144,8 @@ def rank_loan_products(user_info: dict, filtered_df: pd.DataFrame, max_loan_amou
             loan_amount = min(max_loan_amount, row["loan_limit"])
             payment = calculate_monthly_payment(
                 loan_amount=loan_amount,
-                rate_min=row["rate_min"],
-                rate_max=row["rate_max"],
+                rate_min=float(row["rate_min"]),
+                rate_max=float(row["rate_max"]),
                 loan_term=row["loan_term"],
                 repayment_method=row["repayment_method"].strip()
             )
