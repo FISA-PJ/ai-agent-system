@@ -3,9 +3,11 @@
 """
 
 import os
+from dotenv import load_dotenv
 from datetime import datetime, date
-from tools import get_db_connection
+from db.db import get_db_connection
 
+load_dotenv() 
 
 # 프로시저 함수 사용해서 DB에서 사용자 정보 불러오기
 def call_getuserinfobyrrn(rrn: str) -> dict:

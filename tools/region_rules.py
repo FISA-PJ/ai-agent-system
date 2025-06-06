@@ -2,7 +2,10 @@
 지역 규제 분류 함수
 """
 import os
-from tools import get_db_connection
+from dotenv import load_dotenv
+from db.db import get_db_connection
+
+load_dotenv()
 
 # 공고 정보 불러오는 함수
 def get_announcement_by_id(announcement_id: str) -> dict:

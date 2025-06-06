@@ -54,7 +54,7 @@ def filter_loan_products_by_user(user_db_info):
         return filtered_products
         
     except Exception as e:
-        print(f"대출 상품 필터링 오류: {str(e)}")
+        print(f"❌ [filter_loan_products_by_user] 대출 상품 필터링 오류: {str(e)}")
         return [{"error": f"대출 상품 필터링 중 오류가 발생했습니다: {str(e)}"}]
     
 
@@ -128,5 +128,5 @@ def recommend_loans_by_user_and_announcement(input_data):
         return ranked_products
 
     except Exception as e:
-        print(f"대출 상품 추천 오류: {str(e)}")
+        print(f"❌[recommend_loans_by_user_and_announcement] 대출 상품 추천 오류: {str(e)}")
         return [{"error": f"대출 상품 추천 중 오류가 발생했습니다: {str(e)}"}]
