@@ -11,6 +11,7 @@ load_dotenv()
 
 # 프로시저 함수 사용해서 DB에서 사용자 정보 불러오기
 def call_getuserinfobyrrn(rrn: str) -> dict:
+    print(f'[call_getuserinfobyrrn] 주민등록번호: {rrn}')
     conn = get_db_connection(os.getenv("APP_DB"))
 
     try:
@@ -23,6 +24,14 @@ def call_getuserinfobyrrn(rrn: str) -> dict:
 
     finally:
         conn.close()
+# def call_getuserinfobyrrn(rrn: str):
+#     with get_db_connection(os.getenv("APP_DB")) as conn:
+#         with conn.cursor() as cursor:
+#             sql = "CALL getuserinfobyrrn(%s)"
+#             cursor.execute(sql, (rrn.strip(),))
+#             rows = cursor.fetchall()
+#             return rows[-1] if rows else None
+
 
 
 def load_user_by_rrn(rrn: str) -> dict:
@@ -49,7 +58,7 @@ def calculate_age(birth_date_str: str) -> int:
 
 # 월소득 컬럼으로 연소득 계산하는 함수
 def calculate_annual_income(monthly_income: int) -> int:
-    return monthly_income * 12
+    return float(monthly_income) * 12
 
 
 # 부동산 컬럼으로 무주택자, 생애최초 구별

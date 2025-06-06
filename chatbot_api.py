@@ -2,7 +2,7 @@
 
 
 # chatbot_api.py
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -32,5 +32,5 @@ class Query(BaseModel):
 @app.post("/api/chatbot")
 async def chatbot_endpoint(query: Query):
     answer = answer_question(query)
-    print(query)
-    return {"reply": answer}
+    print(f'[chatbot_api] {answer}')
+    return {"reply": str(answer)}

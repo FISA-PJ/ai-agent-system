@@ -35,6 +35,13 @@ def get_announcement_by_id(announcement_id: str) -> dict:
     finally:
         conn.close()
 
+# def get_announcement_by_id(announcement_id: str):
+#     with get_db_connection(os.getenv("NOTICE_DB")) as conn:
+#         with conn.cursor() as cursor:
+#             sql = "SELECT n.notice_number, n.location, h.avg_price FROM notices n JOIN house_types h ON n.id = h.notice_id WHERE n.notice_number = %s;"
+#             cursor.execute(sql, (announcement_id,))
+#             return cursor.fetchone()
+
 
 # 지역 규제 분류 함수
 def classify_region_type(location: str) -> str:

@@ -8,7 +8,7 @@ from db.db import get_db_connection
 
 load_dotenv()
 
-# 대출 상품 불러오는 함수 (DB 대체)
+# # 대출 상품 불러오는 함수 (DB 대체)
 def load_loan_products() -> pd.DataFrame:
     """
     housing_loan_products 테이블에서 대출 상품 데이터를 불러옵니다.
@@ -25,6 +25,7 @@ def load_loan_products() -> pd.DataFrame:
             return df
     finally:
         conn.close()
+
 
 # 사용자 조건에 맞는 대출 상품 필터링하는 함수
 def filter_loan_products(user_db_info: dict, df: pd.DataFrame) -> pd.DataFrame:
