@@ -6,7 +6,6 @@ from prompts.intent_classification_prompt import INTENT_PROMPT
 from prompts.housing_react_agent_prompt import react_housing_prompt
 from prompts.loan_prompt_template import prompt_user, prompt_notice
 from agents.housing_react_agent import housing_react_agent
-from db.db import get_db_connection
 
 __all__ = [
     'es_client',
@@ -20,7 +19,6 @@ __all__ = [
     'FALLBACK_ANSWER',
     'react_housing_prompt',
     'housing_react_agent',
-    'get_db_connection', 
     'prompt_user',
     'prompt_notice',
 ]

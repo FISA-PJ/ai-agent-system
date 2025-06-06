@@ -1,6 +1,8 @@
 from langchain.agents import Tool
 from langgraph.prebuilt import create_react_agent
-from agents import intent_llm, rag_definition_search, rag_notice_search, react_housing_prompt
+from agents import intent_llm, react_housing_prompt
+from tools.rag_notice_search import rag_notice_search
+from tools.rag_definition_search import rag_definition_search
 
 # Tools 정의
 tools = [

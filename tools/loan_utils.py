@@ -2,9 +2,11 @@
 대출 필터링 및 계산 함수 (LTV, 월 예상 상환액 등)
 """
 import os
+from dotenv import load_dotenv
 import pandas as pd
-from tools import get_db_connection
+from db.db import get_db_connection
 
+load_dotenv()
 
 # 대출 상품 불러오는 함수 (DB 대체)
 def load_loan_products() -> pd.DataFrame:

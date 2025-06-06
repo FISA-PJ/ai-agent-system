@@ -21,7 +21,7 @@ def irrelevant_answering_node(state) :
         ]}
         
     else :
-        return {**state, "messages" : [AIMessage(content=IRRELEVANT_ANSWER)]}
+        return {**state, "messages" : [AIMessage(content=IRRELEVANT_ANSWER)], "previous_node" : 'irrelevant_answering_node'}
 
 
 # LLM 기반 "인사말/감사표현" 또는 "그 외"로 분류류
