@@ -11,6 +11,7 @@ def answer_question(Query) :
 
     thread_config = {"configurable" : {"thread_id" : Query.userId}, "recursion_limit": 50}
 
+    print(Query)
     if flag == False : 
         inputs = {
             'user_info' : Query.user_info,
@@ -34,7 +35,8 @@ def answer_question(Query) :
         
         if previous_node == 'notice_selection_node' : 
             flag = True
-            return last_message.content
+        
+        return last_message.content
 
     elif flag == True : 
                 

@@ -1,7 +1,7 @@
 from langchain_core.messages import AnyMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.prebuilt.chat_agent_executor import AgentState
-
+import json
 # react_loan_agent_user에 사용되는 프롬프트
 def prompt_user(state: AgentState, config: RunnableConfig) -> list[AnyMessage]:
     processed = config["configurable"].get("processed", {})

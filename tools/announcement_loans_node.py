@@ -6,9 +6,10 @@ def announcement_loans_node(state): # 공고 ID가 True 일 때
     processed = state.get("processed_user_info", "")
     notice_number = state.get("notice_number", "")
 
-    print("📄 [announcement_loans_node] 전처리 된 사용자 정보 : ", processed)
-    print("[공고번호 : ", notice_number)
-
+    # Decimal('38400000')
+    print("📄 [announcement_loans_node] 전처리 된 사용자 정보 : ", processed, type(processed))
+    print("📄 [공고번호] : ", notice_number, type(notice_number))
+    
     response = react_loan_agent_notice.invoke({
         "messages": [{"role": "user", "content": message}]},
         config={'configurable':{'processed' : processed, 'question' : message, 'notice_number': notice_number}}

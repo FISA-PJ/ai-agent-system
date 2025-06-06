@@ -11,6 +11,9 @@ import json
 import ast
 
 
+import re
+from decimal import Decimal
+
 def filter_loan_products_by_user(user_db_info):
     """
     사용자 정보를 입력받아 조건에 맞는 대출 상품 목록을 필터링
@@ -27,9 +30,11 @@ def filter_loan_products_by_user(user_db_info):
                 # JSON 형태 문자열
                 if user_db_info.strip().startswith('{"'):
                     processed = json.loads(user_db_info)
-                # Python dict 형태 문자열
+                # Python dict 형태 문자열 (Decimal 포함)
                 elif user_db_info.strip().startswith("{'"):
-                    processed = ast.literal_eval(user_db_info)
+                    # Decimal('숫자') 패턴을 일반 숫자로 변환
+                    cleaned_str = re.sub(r"Decimal\('(\d+)'\)", r'\1', user_db_info)
+                    processed = ast.literal_eval(cleaned_str)
                 else:
                     # 단순 문자열인 경우 오류
                     raise ValueError(f"Invalid format: {user_db_info}")
@@ -38,6 +43,13 @@ def filter_loan_products_by_user(user_db_info):
                 return [{"error": f"사용자 정보 파싱 실패: {str(parse_error)}"}]
         else:
             return [{"error": f"지원하지 않는 데이터 타입: {type(user_db_info)}"}]
+        
+        # annual_income이 여전히 Decimal이거나 문자열인 경우 정수로 변환
+        if 'annual_income' in processed:
+            if isinstance(processed['annual_income'], Decimal):
+                processed['annual_income'] = int(processed['annual_income'])
+            elif isinstance(processed['annual_income'], str) and processed['annual_income'].isdigit():
+                processed['annual_income'] = int(processed['annual_income'])
         
         # 필수 필드 확인
         required_fields = ['name', 'age', 'annual_income', 'is_homeless', 'is_first_time', 'group_type']
@@ -54,7 +66,7 @@ def filter_loan_products_by_user(user_db_info):
         return filtered_products
         
     except Exception as e:
-        print(f"❌ [filter_loan_products_by_user] 대출 상품 필터링 오류: {str(e)}")
+        print(f"대출 상품 필터링 오류: {str(e)}")
         return [{"error": f"대출 상품 필터링 중 오류가 발생했습니다: {str(e)}"}]
     
 
@@ -73,14 +85,15 @@ def recommend_loans_by_user_and_announcement(input_data):
             data = input_data
         elif isinstance(input_data, str):
             try:
-                # JSON 형태 문자열
+                # JSON 형태 문자열 시도
                 if input_data.strip().startswith('{"'):
                     data = json.loads(input_data)
-                # Python dict 형태 문자열
-                elif input_data.strip().startswith("{'"):
-                    data = ast.literal_eval(input_data)
+                # Python dict 형태 문자열이지만 Decimal이 포함된 경우
                 else:
-                    raise ValueError(f"Invalid input format: {input_data}")
+                    # Decimal('숫자') 패턴을 일반 숫자로 변환
+                    import re
+                    cleaned_str = re.sub(r"Decimal\('(\d+)'\)", r'\1', input_data)
+                    data = ast.literal_eval(cleaned_str)
             except Exception as parse_error:
                 print(f"입력 데이터 파싱 오류: {parse_error}")
                 return [{"error": f"입력 데이터 파싱 실패: {str(parse_error)}"}]
@@ -97,12 +110,21 @@ def recommend_loans_by_user_and_announcement(input_data):
         # 사용자 정보가 문자열인 경우 다시 파싱
         if isinstance(user_db_info, str):
             try:
+                # JSON 형태 시도
                 if user_db_info.strip().startswith('{"'):
                     user_db_info = json.loads(user_db_info)
-                elif user_db_info.strip().startswith("{'"):
-                    user_db_info = ast.literal_eval(user_db_info)
-            except:
-                return [{"error": "사용자 정보 파싱 실패"}]
+                else:
+                    # Decimal 처리
+                    import re
+                    cleaned_str = re.sub(r"Decimal\('(\d+)'\)", r'\1', user_db_info)
+                    user_db_info = ast.literal_eval(cleaned_str)
+            except Exception as e:
+                print(f"사용자 정보 파싱 오류: {e}")
+                return [{"error": f"사용자 정보 파싱 실패: {str(e)}"}]
+        
+        # annual_income이 문자열인 경우 정수로 변환
+        if isinstance(user_db_info.get('annual_income'), str):
+            user_db_info['annual_income'] = int(user_db_info['annual_income'])
         
         # 1. 공고 정보 조회
         announcement = get_announcement_by_id(announcement_id)
@@ -128,5 +150,5 @@ def recommend_loans_by_user_and_announcement(input_data):
         return ranked_products
 
     except Exception as e:
-        print(f"❌[recommend_loans_by_user_and_announcement] 대출 상품 추천 오류: {str(e)}")
+        print(f"대출 상품 추천 오류: {str(e)}")
         return [{"error": f"대출 상품 추천 중 오류가 발생했습니다: {str(e)}"}]
