@@ -8,6 +8,7 @@ def rag_definition_search(user_message: str) -> str:
     사용자의 질문(query)과 아파트 코드(apt_code)를 기반으로
     관련 공고문 정보를 검색하고 요약된 결과를 반환합니다.
     """
+    print(f'🔎[rag_definition_search] 입력값 : {user_message}')
     query_vec = embedding_model.embed_query(user_message)
 
     hits = es_client.search(index="test-0524-tmp", body={

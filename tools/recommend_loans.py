@@ -19,7 +19,7 @@ def filter_loan_products_by_user(user_db_info):
     사용자 정보를 입력받아 조건에 맞는 대출 상품 목록을 필터링
     """
     try:
-        print(f"받은 데이터 타입: {type(user_db_info)}")
+        print(f"[filter_loan_products_by_user] 받은 데이터 타입: {type(user_db_info)}")
         print(f"받은 데이터: {user_db_info}")
         
         # 다양한 형태의 입력 처리
@@ -40,9 +40,9 @@ def filter_loan_products_by_user(user_db_info):
                     raise ValueError(f"Invalid format: {user_db_info}")
             except Exception as parse_error:
                 print(f"파싱 오류: {parse_error}")
-                return [{"error": f"사용자 정보 파싱 실패: {str(parse_error)}"}]
+                return [{"❌ error": f"사용자 정보 파싱 실패: {str(parse_error)}"}]
         else:
-            return [{"error": f"지원하지 않는 데이터 타입: {type(user_db_info)}"}]
+            return [{"❌ error": f"지원하지 않는 데이터 타입: {type(user_db_info)}"}]
         
         # annual_income이 여전히 Decimal이거나 문자열인 경우 정수로 변환
         if 'annual_income' in processed:
@@ -67,7 +67,7 @@ def filter_loan_products_by_user(user_db_info):
         
     except Exception as e:
         print(f"대출 상품 필터링 오류: {str(e)}")
-        return [{"error": f"대출 상품 필터링 중 오류가 발생했습니다: {str(e)}"}]
+        return [{"❌ error": f"대출 상품 필터링 중 오류가 발생했습니다: {str(e)}"}]
     
 
 def recommend_loans_by_user_and_announcement(input_data):
@@ -77,7 +77,7 @@ def recommend_loans_by_user_and_announcement(input_data):
     예: {"processed": {...}, "notice_number": "123"}
     """
     try:
-        print(f"받은 input_data 타입: {type(input_data)}")
+        print(f"[recommend_loans_by_user_and_announcement] 받은 input_data 타입: {type(input_data)}")
         print(f"받은 input_data: {input_data}")
         
         # 입력 데이터 파싱
@@ -96,13 +96,13 @@ def recommend_loans_by_user_and_announcement(input_data):
                     data = ast.literal_eval(cleaned_str)
             except Exception as parse_error:
                 print(f"입력 데이터 파싱 오류: {parse_error}")
-                return [{"error": f"입력 데이터 파싱 실패: {str(parse_error)}"}]
+                return [{"❌ error": f"입력 데이터 파싱 실패: {str(parse_error)}"}]
         else:
-            return [{"error": f"지원하지 않는 입력 타입: {type(input_data)}"}]
+            return [{"❌error": f"지원하지 않는 입력 타입: {type(input_data)}"}]
         
         # 필수 키 확인
         if "processed" not in data or "notice_number" not in data:
-            return [{"error": "입력 데이터에 'processed'와 'notice_number'가 필요합니다."}]
+            return [{"❌error": "입력 데이터에 'processed'와 'notice_number'가 필요합니다."}]
         
         user_db_info = data["processed"]
         announcement_id = str(data["notice_number"])
