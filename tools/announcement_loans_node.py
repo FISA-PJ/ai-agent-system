@@ -1,5 +1,6 @@
 from langchain_core.messages import AIMessage
 from agents import react_loan_agent_notice
+import re
 
 def announcement_loans_node(state): # 공고 ID가 True 일 때
     message = state["messages"][-1].content
@@ -19,12 +20,13 @@ def announcement_loans_node(state): # 공고 ID가 True 일 때
 
     # ✅ agent_result 추출 (REACT 형식 기준)
     agent_result = response["messages"][-1].content
-    print("🤖 [announcement_loans_node] Agent 응답:", agent_result)
+    result = re.sub(r'\*', '', agent_result)
+    print("🤖 [announcement_loans_node] Agent 응답:", result)
 
 
     # 추천 결과 저장
     return {
         **state,
-        "messages": state["messages"] + [AIMessage(content=agent_result)],
+        "messages": state["messages"] + [AIMessage(content=result)],
         "previous_node": 'announcement_loans_node'
     }
