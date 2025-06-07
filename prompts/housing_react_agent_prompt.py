@@ -2,7 +2,7 @@ import json
 from langchain_core.messages import AnyMessage
 from langchain_core.runnables import RunnableConfig
 
-def prompt(state, config: RunnableConfig) -> list[AnyMessage]:
+def react_housing_prompt(state, config: RunnableConfig) -> list[AnyMessage]:
     notice_number = config["configurable"].get("notice_number")
     user_info = config["configurable"].get("user_info")
     user_message = config["configurable"].get("user_message")
