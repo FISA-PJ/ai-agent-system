@@ -35,7 +35,7 @@ def answer_question(Query) :
         
         if previous_node == 'notice_selection_node' : 
             flag = True
-        
+    
         return last_message.content
 
     elif flag == True : 
