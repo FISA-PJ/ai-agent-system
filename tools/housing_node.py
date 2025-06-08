@@ -20,16 +20,17 @@ def housing_react_node(state) :
         )
 
         agent_result = response['messages'][-1].content
-        print(f"🤖[housing_react_node] 에이전트 응답 결과: {agent_result}")
+        result = re.sub(r'\*', '', agent_result)
+        print(f"🤖[housing_react_node] 에이전트 응답 결과: {result}")
         
-        if "현재 선택된 공고가 없습니다" in agent_result :
+        if "현재 선택된 공고가 없습니다" in result :
             need_notice_selection = True
         else :
             need_notice_selection = False
         
         return {
             **state,
-            "messages": [AIMessage(content=agent_result)],
+            "messages": [AIMessage(content=result)],
             "need_notice_selection": need_notice_selection,
             "previous_node" : 'housing_react_node'
         }
