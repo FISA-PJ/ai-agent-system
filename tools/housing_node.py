@@ -1,6 +1,6 @@
 from langchain_core.messages import AIMessage
 from tools import housing_react_agent
-
+import re
 
 # 청약 관련 질문에 대해 ReAct Agent 호출하여 결과 도출하는 메인 노드 
 def housing_react_node(state) :
