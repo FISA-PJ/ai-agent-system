@@ -31,7 +31,7 @@ def react_housing_prompt(state, config: RunnableConfig) -> list[AnyMessage]:
    - 그 외 → 유효한 공고 번호로 간주합니다.
 
 2. search_housing_notice_from_es 도구를 사용하는 경우 다음 JSON을 정확히 입력하세요: {combined_json}
-  - 이 주어진 JSON 문자열을 그대로 복사해서 사용하세요. 
+  - 이 주어진 JSON 문자열{combined_json}을 그대로 복사해서 입력값으로 사용하세요. 
 
 3. search_housing_definition_from_es 도구를 사용하는 경우 "{user_message}"를 입력하세요.
 
@@ -46,6 +46,7 @@ def react_housing_prompt(state, config: RunnableConfig) -> list[AnyMessage]:
 5. 공고와 관련된 질문인 경우:
    - 공고 번호(notice_number)가 없으면 "현재 선택된 공고가 없습니다. 공고 번호를 입력해 주세요." 라고 답변하고 종료합니다.
    - 공고 번호(notice_number)가 있으면 search_housing_notice_from_es 사용
+   - 만약 전매 제한에 대한 질문이 들어온다면, 전매 제한 기간과 거주 의무 기간을 search_housing_notice_from_es에서 찾아서 함께 언급해주세요.
    - 사용자 정보 {user_info}를 참고하여 적합한 정보를 선별합니다.
    - 답변을 작성할 때는 반드시 아래 형식을 따르세요:
 
@@ -85,11 +86,12 @@ Final Answer: 원래 입력된 질문에 대한 최종 답변
 
 ## 추가적인 주의사항
 - 반드시 [Thought -> Action -> Action Input format] 사이클을 준수하십시오. 항상 Action 전에는 Thought가 먼저 나와야 합니다.
+- 최종 답변이 나왔따면 Final Answer만은 최종 답변으로 출력하세요. 
 - 정보가 부족한 경우 일반적인 정보를 제공하되, "정확한 정보는 해당 기관에 추가 확인해 주시기 바랍니다."라는 안내 문구를 반드시 추가하십시오.
 - 최종 답변에는 최대한 많은 내용을 포함하십시오.
 - 추천이유는 반드시 사용자 정보와 관련지어 작성하세요.
 - 불필요한 도구 사용 금지: 묻지 않은 정보 검색 금지
-- 한 번의 검색으로 부족할 경우 문제를 세분화하여 해결하세요.
+- 문장이 여러 개이거나 한 문장 안에서 물어보는 사항이 여러 개인 경우, 또는 한 번의 검색으로 부족할 경우 문제를 세분화하여 해결하세요.
 - 추가 검색이 답변 품질을 크게 개선하지 않을 것으로 판단되거나 핵심 정보와 관련 맥락 정보 모두 수집 완료한 경우, Final Answer로 진행하세요
 
 시작하세요!

@@ -11,7 +11,7 @@ def rag_definition_search(user_message: str) -> str:
     print(f'🔎[rag_definition_search] 입력값 : {user_message}')
     query_vec = embedding_model.embed_query(user_message)
 
-    hits = es_client.search(index="test-0524-tmp", body={
+    hits = es_client.search(index="housing-definition", body={
         "knn": {
             "field": "vector",
             "query_vector": query_vec,

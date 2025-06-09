@@ -1,6 +1,6 @@
 from langchain.agents import Tool
 from langgraph.prebuilt import create_react_agent
-from agents import intent_llm
+from agents import agent_llm
 from tools.recommend_loans import filter_loan_products_by_user, recommend_loans_by_user_and_announcement
 from tools import prompt_user, prompt_notice
 
@@ -13,7 +13,7 @@ loan_tools_user = [
     )
 ]
 
-react_loan_agent_user = create_react_agent(model=intent_llm, tools=loan_tools_user, prompt=prompt_user)
+react_loan_agent_user = create_react_agent(model=agent_llm, tools=loan_tools_user, prompt=prompt_user)
 
 
 loan_tools_notice = [
@@ -24,4 +24,4 @@ loan_tools_notice = [
     )
 ]
 
-react_loan_agent_notice = create_react_agent(model=intent_llm, tools=loan_tools_notice, prompt=prompt_notice)
+react_loan_agent_notice = create_react_agent(model=agent_llm, tools=loan_tools_notice, prompt=prompt_notice)

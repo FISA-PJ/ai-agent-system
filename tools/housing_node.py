@@ -36,6 +36,7 @@ def housing_react_node(state) :
             "previous_node" : 'housing_react_node'
         }
         
+        
     except Exception as e : 
         print(f"❌ [Housing React Node] ReAct Agent 실행 중 오류 발생: {e}")
         return {

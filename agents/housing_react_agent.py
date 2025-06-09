@@ -1,6 +1,6 @@
 from langchain.agents import Tool
 from langgraph.prebuilt import create_react_agent
-from agents import intent_llm, react_housing_prompt
+from agents import agent_llm, react_housing_prompt
 from tools.rag_notice_search import rag_notice_search
 from tools.rag_definition_search import rag_definition_search
 
@@ -18,4 +18,4 @@ tools = [
     ),
 ]
 
-housing_react_agent = create_react_agent(model=intent_llm, tools=tools, prompt=react_housing_prompt)
+housing_react_agent = create_react_agent(model=agent_llm, tools=tools, prompt=react_housing_prompt)
