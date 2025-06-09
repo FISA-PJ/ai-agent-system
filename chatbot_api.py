@@ -33,4 +33,4 @@ class Query(BaseModel):
 async def chatbot_endpoint(query: Query):
     answer = answer_question(query)
     print(f'[chatbot_api] {answer}')
-    return {"reply": str(answer)}
+    return {"reply": str(answer)} # 전매 제한 기간이 어떻게 돼? 입주 후 언제부터 팔 수 있어?

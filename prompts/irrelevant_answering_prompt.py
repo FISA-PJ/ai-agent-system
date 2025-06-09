@@ -4,7 +4,12 @@ from langchain.prompts import PromptTemplate
 CLASSIFY_IRR_MMS_TYPE_PROMPT = PromptTemplate(
     input_variables=["user_message"],
     template ='''
-    다음 메시지가 인사말이나 감사표현인지 판단해주세요.
+    다음 메시지가 인사말/감사표현인지 또는 그 외의 내용인지 판단해주세요.
+
+    판단 기준:
+    - 인사말: 대화 시작이나 끝에 사용되는 인사 표현 (예: 안녕하세요, 하이, 좋은 아침입니다, 좋은 하루 되세요 등)
+    - 감사표현: 감사의 뜻을 전하는 표현 (예: 고맙습니다, 감사합니다, 수고하셨습니다 등)
+    - 그 외의 질문, 요청, 명령, 정보 제공, 대화 주제 제안 등은 모두 "기타"로 분류합니다.
 
     메시지: "{user_message}"
 
@@ -13,7 +18,10 @@ CLASSIFY_IRR_MMS_TYPE_PROMPT = PromptTemplate(
     - 고마워요, 감사합니다, 고맙습니다
     - 수고하세요, 좋은 하루 되세요
     - 처음 뵙겠습니다, 반갑습니다
-
+    
+    인사말/감사표현 외의 {user_message}는 모두 "기타"에 해당합니다.
+    판단이 애매한 경우에는 반드시 "기타"로 분류합니다.
+    
     답변은 반드시 "인사말" 또는 "기타" 중 하나로만 응답해주세요.'''
     )
 

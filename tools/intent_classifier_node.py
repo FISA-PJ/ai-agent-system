@@ -19,7 +19,7 @@ def intent_classifier(state) :
         print(f"❌ [intent_classifier] 의도 분류 중 오류 발생: {e}", exc_info=True)
         intent = DEFAULT_INTENT
 
-    print(f"📄 [intent_classifier] 수행 결과: {intent}")
+    print(f"📄 [intent_classifier] 의도 분류 결과: {intent}\n")
     return {**state, "intent" : intent, "previous_node" : 'intent_classifier'}
 
 

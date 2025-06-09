@@ -12,6 +12,7 @@ def irrelevant_answering_node(state) :
         return {**state, "messages":  [AIMessage(content=IRRELEVANT_ANSWER)]}
     
     classification_result = _classify_irrelevant_message_type(user_message)
+    print(f"[irrelevant_answering_node] 분류 결과: {classification_result}")
     
     if "인사말" in classification_result :
         chain = GREETING_PROMPT | intent_llm
@@ -32,9 +33,9 @@ def _classify_irrelevant_message_type(user_message):
             'user_message': user_message
         })
 
-        logger.debug(f"무관한 질문 도메인 분류 결과(인사말 or 기타): {response.content}")
+        print(f"[_classify_irrelevant_message_type] 무관한 질문 도메인 분류 결과(인사말 or 기타): {response.content}")
         return response.content
     
     except Exception as e:
-        logger.error(f"메시지 분류 중 오류 발생: {e}")
+        print(f"❌ [_classify_irrelevant_message_type] 메시지 분류 중 오류 발생: {e}")
         return "기타"
